@@ -24,9 +24,10 @@ where
             result = t;
 
             if !((result.abs() < (factor * next_term).abs()) && counter > 1) {
-                counter -= 1;
                 break;
             }
+
+            counter -= 1;
         }
         result
     } else {

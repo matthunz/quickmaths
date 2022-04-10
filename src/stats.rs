@@ -1,4 +1,4 @@
-use crate::{epsilon, series::kahan_sum, Digits};
+use crate::{epsilon, series::kahan_sum, Digits, fraction::upper_gamma_fraction};
 use std::f64::consts::{FRAC_2_SQRT_PI, PI};
 
 pub fn erf(value: f64, mut invert: bool) -> f64 {
@@ -19,7 +19,11 @@ pub fn erf(value: f64, mut invert: bool) -> f64 {
         invert = !invert;
         (-x).exp() / (PI.sqrt() * value)
     } else {
-        todo!()
+        invert = !invert;
+        let mut result = value * (-x).exp();
+         result /= PI.sqrt();
+         result *= upper_gamma_fraction(0.5, x, epsilon());
+         result
     };
 
     if invert {

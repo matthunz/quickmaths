@@ -16,10 +16,17 @@ pub fn epsilon() -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::stats::erf;
+    use crate::{stats::erf, fraction::upper_gamma_fraction, epsilon};
 
     #[test]
     fn it_works() {
-        dbg!(erf(0.2, false));
+        dbg!(erf(5., false));
+
+        let a = 5.5;
+        let z = 3.;
+        
+        let f =upper_gamma_fraction(a, z, epsilon()) ;
+        dbg!(z.powf(a) * (-z).exp() * f);
+
     }
 }
