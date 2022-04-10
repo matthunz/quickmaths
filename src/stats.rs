@@ -1,33 +1,59 @@
-use crate::{epsilon, series::kahan_sum, Digits, fraction::upper_gamma_fraction};
-use std::f64::consts::{FRAC_2_SQRT_PI, PI};
+use crate::{
+    epsilon,
+    fraction::{upper_gamma_fraction, Ratio, Tiny},
+    series::kahan_sum,
+    Digits,
+};
+use num::{
+    traits::{real::Real, FloatConst},
+    FromPrimitive, One, Zero,
+};
+use std::ops::{AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
-pub fn erf(value: f64, mut invert: bool) -> f64 {
+pub fn erf<T>(value: T, mut invert: bool) -> T
+where
+    T: Tiny
+        + Digits
+        + FromPrimitive
+        + FloatConst
+        + Real
+        + Zero
+        + Neg<Output = T>
+        + AddAssign
+        + SubAssign
+        + One
+        + MulAssign
+        + Mul<Output = T>
+        + Div<Output = T>
+        + From<Ratio<i32>>
+        + PartialOrd,
+    for<'t> &'t T: Sub<Output = T> + Mul<Output = T>,
+{
     let x = value * value;
-    let result = if value < 1.3 {
-        let mut k = 0.;
+    let result = if value < Ratio::new(13, 10).into() {
+        let mut k = T::zero();
         let mut term = value;
         let zz = -value * value;
         let f = || {
-            let result = term / (2. * k + 1.);
-            k += 1.;
+            let result = term / (T::from_u8(2).unwrap() * k + T::one());
+            k += T::one();
             term *= zz / k;
             result
         };
 
-        FRAC_2_SQRT_PI * kahan_sum(f, 0f64.precision_digits(), Some(usize::MAX))
-    } else if x > 1. / epsilon() {
+        T::FRAC_2_SQRT_PI() * kahan_sum(f, T::zero().precision_digits(), Some(usize::MAX))
+    } else if x > T::one() / epsilon() {
         invert = !invert;
-        (-x).exp() / (PI.sqrt() * value)
+        (-x).exp() / (T::PI().sqrt() * value)
     } else {
         invert = !invert;
-        let mut result = value * (-x).exp();
-         result /= PI.sqrt();
-         result *= upper_gamma_fraction(0.5, x, epsilon());
-         result
+
+        ((value * (-x).exp()) / T::PI().sqrt())
+            * upper_gamma_fraction(Ratio::new(1, 2).into(), x, epsilon())
     };
 
     if invert {
-        1. - result
+        T::one() - result
     } else {
         result
     }

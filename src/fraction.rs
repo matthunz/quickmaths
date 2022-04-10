@@ -1,4 +1,4 @@
-use num::{traits::real::Real, FromPrimitive, Integer, One, Zero};
+use num::{traits::real::Real, FromPrimitive, Integer, One, Zero, ToPrimitive};
 use std::ops::{Add, AddAssign, Mul, Sub};
 
 pub struct Ratio<T> {
@@ -17,6 +17,12 @@ impl<T> Ratio<T> {
 
     pub fn denom(&self) -> &T {
         &self.d
+    }
+}
+
+impl<T> From<Ratio<T>> for f64 where T: ToPrimitive{
+    fn from(ratio: Ratio<T>) -> Self {
+        ratio.numer().to_f64().unwrap() / ratio.denom().to_f64().unwrap()
     }
 }
 

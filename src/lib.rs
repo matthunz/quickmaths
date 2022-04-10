@@ -1,5 +1,6 @@
 mod digits;
 pub use digits::Digits;
+use num::{One, FromPrimitive, traits::real::Real};
 
 pub mod fraction;
 
@@ -10,8 +11,8 @@ pub fn ldexp(x: u32, exp: u32) -> u32 {
     x * 2u32.pow(exp)
 }
 
-pub fn epsilon() -> f64 {
-    1. * 2f64.powi(1 - (0f64.digits() as i32))
+pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
+    T::one() * T::from_u8(2).unwrap().powi(1 - (0f64.digits() as i32))
 }
 
 #[cfg(test)]
