@@ -1,28 +1,11 @@
-use std::f64::consts::{FRAC_2_SQRT_PI, PI};
+use std::{
+    f64::consts::{FRAC_2_SQRT_PI, PI},
+    ops::SubAssign,
+};
 
-pub fn kahan_sum<F>(bits: u32, mut f: F)
-where
-    F: FnMut() -> f64,
-{
-    let factor = 2u32.pow(bits) as f64;
+use num::{traits::real::Real, FromPrimitive};
 
-    let mut result = f();
-    let mut carry = 0.;
-
-    let mut next;
-    loop {
-        next = f();
-        let y = next - carry;
-        let t = result + y;
-        carry = t - result;
-        carry -= y;
-        result = t;
-
-        if result.abs() >= (factor * next).abs() {
-            break;
-        }
-    }
-}
+pub mod fraction;
 
 pub fn ldexp(x: u32, exp: u32) -> u32 {
     x * 2u32.pow(exp)
@@ -32,35 +15,53 @@ pub fn epsilon() -> f64 {
     1. * 2f64.powi(1 - (0f64.digits() as i32))
 }
 
-pub fn kahan_sum_max<F>(mut f: F, bits: u32, max_terms: usize) -> f64
+pub fn kahan_sum<T, F>(mut f: F, bits: u32, max_terms: Option<usize>) -> T
 where
-    F: FnMut() -> f64,
+    F: FnMut() -> T,
+    T: FromPrimitive + Real + SubAssign,
 {
-    let mut counter = max_terms;
+    if let Some(max_terms) = max_terms {
+        let mut counter = max_terms;
 
-    let factor = ldexp(1, bits) as f64;
-    let mut result = f();
-    let mut next_term;
-    let mut carry = 0.;
+        let factor = T::from_u32(ldexp(1, bits)).unwrap();
+        let mut result = f();
+        let mut next_term;
+        let mut carry = T::zero();
 
-    loop {
-        next_term = f();
-        let y = next_term - carry;
-        let t = result + y;
-        carry = t - result;
-        carry -= y;
-        result = t;
+        loop {
+            next_term = f();
+            let y = next_term - carry;
+            let t = result + y;
+            carry = t - result;
+            carry -= y;
+            result = t;
 
-        if !((result.abs() < (factor * next_term).abs()) && counter > 1) {
-            counter -= 1;
-            break;
+            if !((result.abs() < (factor * next_term).abs()) && counter > 1) {
+                counter -= 1;
+                break;
+            }
+        }
+        result
+    } else {
+        let factor = T::from_u32(2u32.pow(bits)).unwrap();
+
+        let mut result = f();
+        let mut carry = T::zero();
+
+        let mut next;
+        loop {
+            next = f();
+            let y = next - carry;
+            let t = result + y;
+            carry = t - result;
+            carry -= y;
+            result = t;
+
+            if result.abs() >= (factor * next).abs() {
+                break result;
+            }
         }
     }
-
-    // set max_terms to the actual number of terms of the series evaluated:
-    // max_terms = max_terms - counter;
-
-    return result;
 }
 
 pub trait Digits {
@@ -102,7 +103,7 @@ pub fn erf(value: f64, mut invert: bool) -> f64 {
             result
         };
 
-        FRAC_2_SQRT_PI * kahan_sum_max(f, 0f64.precision_digits(), usize::MAX)
+        FRAC_2_SQRT_PI * kahan_sum(f, 0f64.precision_digits(), Some(usize::MAX))
     } else if x > 1. / epsilon() {
         invert = !invert;
         (-x).exp() / (PI.sqrt() * value)
