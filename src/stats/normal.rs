@@ -1,4 +1,4 @@
-use super::{ Distribution, ErrorFunction};
+use super::{Distribution, ErrorFunction};
 use crate::{
     fraction::{Ratio, Tiny},
     Digits,
@@ -41,10 +41,6 @@ where
 
     fn cdf(&self, x: &Self::Value, error: ErrorFunction) -> Self::Value {
         let one_half: T = Ratio::new(1, 2).into();
-        one_half
-            * error.complementary_error(
-                (&self.mean - x) / (self.std_deviation * T::SQRT_2()),
-       
-            )
+        one_half * error.complementary_error((&self.mean - x) / (self.std_deviation * T::SQRT_2()))
     }
 }

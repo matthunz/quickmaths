@@ -41,7 +41,7 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 #[cfg(test)]
 mod tests {
-    use crate::stats::{ Distribution, NormalDistribution, ErrorFunction};
+    use crate::stats::{Distribution, ErrorFunction, NormalDistribution};
 
     #[test]
     fn it_works() {
