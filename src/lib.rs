@@ -17,17 +17,19 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 #[cfg(test)]
 mod tests {
-    use crate::{stats::erf, fraction::upper_gamma_fraction, epsilon};
+    use crate::{stats::{erf, Normal}, fraction::upper_gamma_fraction, epsilon};
 
     #[test]
     fn it_works() {
-        dbg!(erf(5., false));
+        dbg!(erf(5.));
 
         let a = 5.5;
         let z = 3.;
         
         let f =upper_gamma_fraction(a, z, epsilon()) ;
         dbg!(z.powf(a) * (-z).exp() * f);
+
+        dbg!(Normal::standard().cdf(&0.2));
 
     }
 }
