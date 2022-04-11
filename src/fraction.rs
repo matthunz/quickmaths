@@ -1,5 +1,7 @@
-use num::{traits::real::Real, FromPrimitive, Integer, One, ToPrimitive, Zero};
-use std::ops::{Add, AddAssign, Mul, Sub};
+use num::{traits::real::Real, FromPrimitive, One, ToPrimitive, Zero};
+use std::ops::{Add, Mul, Sub};
+
+use crate::Limit;
 
 pub struct Ratio<T> {
     n: T,
@@ -55,63 +57,62 @@ where
     }
 }
 
-impl<T> Fraction for UpperIncompleteGammaFraction<T>
+impl<T> Iterator for UpperIncompleteGammaFraction<T>
 where
     for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
     T: FromPrimitive + Clone,
 {
-    type Value = T;
+    type Item = Ratio<T>;
 
-    fn next(&mut self) -> Ratio<Self::Value> {
+    fn next(&mut self) -> Option<Self::Item> {
         self.k += 1;
         self.z = &self.z + &T::from_u8(2).unwrap();
 
         let k = T::from_i32(self.k).unwrap();
-        Ratio::new(&k * &(&self.a - &k), self.z.clone())
+        Some(Ratio::new(&k * &(&self.a - &k), self.z.clone()))
     }
 }
 
-pub fn continued_fraction_a<F>(mut fraction: F, factor: F::Value, max_terms: usize) -> F::Value
+pub fn continued_fraction_a<T, F>(fraction: F, factor: T) -> T
 where
-    F: Fraction,
-    F::Value: One + Zero + Real + Tiny + Clone,
+    F: IntoIterator<Item = Ratio<T>>,
+    T: One + Zero + Real + Tiny + Clone,
 {
+    let mut fraction = fraction.into_iter();
     let terminator = factor.abs();
-    let mut v = fraction.next();
+    let mut v = fraction.next().unwrap();
 
     let mut f = v.numer().clone();
     let a0 = v.denom().clone();
 
     if f.is_zero() {
-        f = F::Value::tiny();
+        f = T::tiny();
     }
 
     let mut c = f;
-    let mut d = F::Value::zero();
-
-    let mut counter = max_terms;
+    let mut d = T::zero();
 
     let mut delta;
-    loop {
-        v = fraction.next();
+
+    while let Some(next) = fraction.next() {
+        v = next;
+
         d = v.numer().clone() + v.denom().clone() * d;
         if d.is_zero() {
-            d = F::Value::tiny();
+            d = T::tiny();
         }
 
         c = v.numer().clone() + v.denom().clone() / c;
         if c.is_zero() {
-            c = F::Value::tiny();
+            c = T::tiny();
         }
 
         delta = c * d;
         f = f * delta;
 
-        if !((delta - F::Value::one()).abs() > terminator && counter > 1) {
+        if (delta - T::one()).abs() <= terminator {
             break;
         }
-
-        counter -= 1;
     }
 
     a0 / f
@@ -127,7 +128,7 @@ impl Tiny for f64 {
     }
 }
 
-pub fn upper_gamma_fraction<T>(a: T, z: T, eps: T) -> T
+pub fn upper_gamma_fraction<T>(a: T, z: T, eps: T, limit: Limit) -> T
 where
     for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
     T: Real + Tiny + FromPrimitive + One,
@@ -135,7 +136,7 @@ where
     // Multiply result by z^a * e^-z to get the full
     // upper incomplete integral.  Divide by tgamma(z)
     // to normalise.
-    let f = UpperIncompleteGammaFraction::new(a, z);
+    let f = UpperIncompleteGammaFraction::new(a, z).take(limit.into());
 
-    T::one() / (z - a + T::one() + continued_fraction_a(f, eps, 1000))
+    T::one() / (z - a + T::one() + continued_fraction_a(f, eps))
 }

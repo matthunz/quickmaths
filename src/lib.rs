@@ -7,6 +7,30 @@ pub mod fraction;
 pub mod series;
 pub mod stats;
 
+pub struct Limit {
+    iterations: usize,
+}
+
+impl Default for Limit {
+    fn default() -> Self {
+        Self::new(1_000_000)
+    }
+}
+
+impl Limit {
+    pub const MAX: Self = Self::new(usize::MAX);
+
+    pub const fn new(iterations: usize) -> Self {
+        Self { iterations }
+    }
+}
+
+impl From<Limit> for usize {
+    fn from(limit: Limit) -> Self {
+        limit.iterations
+    }
+}
+
 pub fn ldexp(x: u32, exp: u32) -> u32 {
     x * 2u32.pow(exp)
 }
@@ -17,22 +41,12 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        epsilon,
-        fraction::upper_gamma_fraction,
-        stats::{erf, Distribution, NormalDistribution},
-    };
+    use crate::stats::{ Distribution, NormalDistribution, ErrorFunction};
 
     #[test]
     fn it_works() {
-        dbg!(erf(5.));
+        dbg!(ErrorFunction::default().error(5.));
 
-        let a = 5.5;
-        let z = 3.;
-
-        let f = upper_gamma_fraction(a, z, epsilon());
-        dbg!(z.powf(a) * (-z).exp() * f);
-
-        dbg!(NormalDistribution::standard().cdf(&0.2));
+        dbg!(NormalDistribution::standard().cdf(&0.2, ErrorFunction::default()));
     }
 }
