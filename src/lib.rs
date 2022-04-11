@@ -1,6 +1,6 @@
 mod digits;
 pub use digits::Digits;
-use num::{One, FromPrimitive, traits::real::Real};
+use num::{traits::real::Real, FromPrimitive, One};
 
 pub mod fraction;
 
@@ -17,7 +17,11 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 #[cfg(test)]
 mod tests {
-    use crate::{stats::{erf, Normal}, fraction::upper_gamma_fraction, epsilon};
+    use crate::{
+        epsilon,
+        fraction::upper_gamma_fraction,
+        stats::{erf, Distribution, NormalDistribution},
+    };
 
     #[test]
     fn it_works() {
@@ -25,11 +29,10 @@ mod tests {
 
         let a = 5.5;
         let z = 3.;
-        
-        let f =upper_gamma_fraction(a, z, epsilon()) ;
+
+        let f = upper_gamma_fraction(a, z, epsilon());
         dbg!(z.powf(a) * (-z).exp() * f);
 
-        dbg!(Normal::standard().cdf(&0.2));
-
+        dbg!(NormalDistribution::standard().cdf(&0.2));
     }
 }
