@@ -8,7 +8,7 @@ use num::{
     traits::{real::Real, FloatConst},
     FromPrimitive, One, Zero,
 };
-use std::ops::{AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::{ops::{AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign}, iter};
 
 pub fn erf<T>(value: T, mut invert: bool) -> T
 where
@@ -34,14 +34,14 @@ where
         let mut k = T::zero();
         let mut term = value;
         let zz = -value * value;
-        let f = || {
+        let f = iter::from_fn(|| {
             let result = term / (T::from_u8(2).unwrap() * k + T::one());
             k += T::one();
             term *= zz / k;
-            result
-        };
+            Some(result)
+        });
 
-        T::FRAC_2_SQRT_PI() * kahan_sum(f, T::zero().precision_digits(), Some(usize::MAX))
+        T::FRAC_2_SQRT_PI() * kahan_sum(f)
     } else if x > T::one() / epsilon() {
         invert = !invert;
         (-x).exp() / (T::PI().sqrt() * value)
