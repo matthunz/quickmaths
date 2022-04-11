@@ -6,28 +6,17 @@ use crate::{
 };
 use num::{
     traits::{real::Real, FloatConst},
-    FromPrimitive, One, Zero,
+    FromPrimitive,
 };
-use std::{ops::{AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign}, iter};
+use std::{
+    iter,
+    ops::{Add, Mul, Sub},
+};
 
 pub fn erf<T>(value: T, mut invert: bool) -> T
 where
-    T: Tiny
-        + Digits
-        + FromPrimitive
-        + FloatConst
-        + Real
-        + Zero
-        + Neg<Output = T>
-        + AddAssign
-        + SubAssign
-        + One
-        + MulAssign
-        + Mul<Output = T>
-        + Div<Output = T>
-        + From<Ratio<i32>>
-        + PartialOrd,
-    for<'t> &'t T: Sub<Output = T> + Mul<Output = T>,
+    T: Tiny + Digits + FromPrimitive + FloatConst + Real + From<Ratio<i32>> + PartialOrd,
+    for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
 {
     let x = value * value;
     let result = if value < Ratio::new(13, 10).into() {
@@ -36,8 +25,8 @@ where
         let zz = -value * value;
         let f = iter::from_fn(|| {
             let result = term / (T::from_u8(2).unwrap() * k + T::one());
-            k += T::one();
-            term *= zz / k;
+            k = k + T::one();
+            term = term * (zz / k);
             Some(result)
         });
 

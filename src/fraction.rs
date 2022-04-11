@@ -1,4 +1,4 @@
-use num::{traits::real::Real, FromPrimitive, Integer, One, Zero, ToPrimitive};
+use num::{traits::real::Real, FromPrimitive, Integer, One, ToPrimitive, Zero};
 use std::ops::{Add, AddAssign, Mul, Sub};
 
 pub struct Ratio<T> {
@@ -20,7 +20,10 @@ impl<T> Ratio<T> {
     }
 }
 
-impl<T> From<Ratio<T>> for f64 where T: ToPrimitive{
+impl<T> From<Ratio<T>> for f64
+where
+    T: ToPrimitive,
+{
     fn from(ratio: Ratio<T>) -> Self {
         ratio.numer().to_f64().unwrap() / ratio.denom().to_f64().unwrap()
     }
@@ -40,12 +43,12 @@ pub struct UpperIncompleteGammaFraction<T> {
 
 impl<T> UpperIncompleteGammaFraction<T>
 where
-    for<'t> &'t T: Sub<&'t T, Output = T> + Mul<&'t T, Output = T>,
-    T: FromPrimitive + One + AddAssign + Add<Output = T>,
+    for<'t> &'t T: Sub<Output = T> + Add<Output = T>,
+    T: One,
 {
     pub fn new(a1: T, z1: T) -> Self {
         Self {
-            z: &z1 - &a1 + T::one(),
+            z: &(&z1 - &a1) + &T::one(),
             a: a1,
             k: 0,
         }
@@ -54,14 +57,14 @@ where
 
 impl<T> Fraction for UpperIncompleteGammaFraction<T>
 where
-    for<'t> &'t T: Sub<&'t T, Output = T> + Mul<&'t T, Output = T>,
-    T: FromPrimitive + AddAssign + Clone,
+    for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
+    T: FromPrimitive + Clone,
 {
     type Value = T;
 
     fn next(&mut self) -> Ratio<Self::Value> {
         self.k += 1;
-        self.z += T::from_u8(2).unwrap();
+        self.z = &self.z + &T::from_u8(2).unwrap();
 
         let k = T::from_i32(self.k).unwrap();
         Ratio::new(&k * &(&self.a - &k), self.z.clone())
@@ -126,13 +129,13 @@ impl Tiny for f64 {
 
 pub fn upper_gamma_fraction<T>(a: T, z: T, eps: T) -> T
 where
-    for<'t> &'t T: Sub<&'t T, Output = T> + Mul<&'t T, Output = T>,
-    T: Real + Tiny + FromPrimitive + One + AddAssign + Add<Output = T>,
+    for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
+    T: Real + Tiny + FromPrimitive + One,
 {
     // Multiply result by z^a * e^-z to get the full
     // upper incomplete integral.  Divide by tgamma(z)
     // to normalise.
     let f = UpperIncompleteGammaFraction::new(a, z);
 
-    T::one() / (z - a + T::one() + continued_fraction_a(f, eps, 10000000))
+    T::one() / (z - a + T::one() + continued_fraction_a(f, eps, 1000))
 }
