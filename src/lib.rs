@@ -1,6 +1,6 @@
 mod digits;
 pub use digits::Digits;
-use num::{traits::real::Real, FromPrimitive, One};
+use num::{traits::real::Real, FromPrimitive, Integer, One, Zero};
 
 pub mod fraction;
 
@@ -41,9 +41,23 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
     T::one() * T::from_u8(2).unwrap().powi(1 - (0f64.digits() as i32))
 }
 
+pub fn gcd<I>(integers: I) -> I::Item
+where
+    I: IntoIterator,
+    I::Item: Integer,
+{
+    let mut iter = integers.into_iter();
+    iter.next()
+        .map(|i| iter.fold(i, |acc, i| acc.gcd(&i)))
+        .unwrap_or_else(|| I::Item::zero())
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::{stats::{Distribution, ErrorFunction, NormalDistribution}, poly::Polynomial};
+    use crate::{
+        poly::Polynomial,
+        stats::{Distribution, ErrorFunction, NormalDistribution},
+    };
 
     #[test]
     fn it_works() {
@@ -51,6 +65,6 @@ mod tests {
 
         dbg!(NormalDistribution::standard().cdf(&0.2, ErrorFunction::default()));
 
-        dbg!([0., 4.].intergral().collect::<Vec<_>>());
+        dbg!([0., 4.].integral().collect::<Vec<_>>());
     }
 }

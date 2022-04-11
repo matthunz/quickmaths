@@ -1,15 +1,29 @@
-use std::{ops::{Mul, Div}};
-use num::{FromPrimitive, Zero};
+use num::{FromPrimitive, Integer, Zero};
+use std::ops::Div;
 
 pub trait Polynomial: IntoIterator + Sized {
-    fn intergral(self) -> Integral<Self::IntoIter> {
-        Integral { iter: self.into_iter(), pos: 0 }
+    /// ```
+    /// use quickmaths::poly::Polynomial;
+    ///
+    /// let poly = [0., 4.];
+    /// assert!(poly.integral().eq([0., 0., 2.]));
+    /// ```
+    fn integral(self) -> Integral<Self::IntoIter> {
+        Integral {
+            iter: self.into_iter(),
+            pos: 0,
+        }
+    }
+
+    fn content(self) -> Self::Item
+    where
+        Self::Item: Integer,
+    {
+        crate::gcd(self)
     }
 }
 
-impl<T> Polynomial for T where T: IntoIterator {
-
-}
+impl<T> Polynomial for T where T: IntoIterator {}
 
 pub struct Integral<T: Iterator> {
     iter: T,
