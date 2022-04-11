@@ -6,16 +6,6 @@ pub use gamma::{upper_gamma_fraction, UpperIncompleteGammaFraction};
 pub trait Fraction: IntoIterator<Item = Ratio<Self::Value>> + Sized {
     type Value: One + Zero + Real + Tiny + Clone;
 
-    /// Evaluates:
-    ///
-    ///            a1
-    ///      ---------------
-    ///      b1 +     a2
-    ///           ----------
-    ///           b2 +   a3
-    ///                -----
-    ///                b3 + ...
-    ///
     fn continued_fraction_a(self, factor: Self::Value) -> Self::Value {
         let mut fraction = self.into_iter();
         let terminator = factor.abs();

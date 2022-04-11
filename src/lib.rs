@@ -7,6 +7,8 @@ pub mod fraction;
 pub mod series;
 pub mod stats;
 
+pub mod poly;
+
 pub struct Limit {
     iterations: usize,
 }
@@ -41,12 +43,14 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 #[cfg(test)]
 mod tests {
-    use crate::stats::{Distribution, ErrorFunction, NormalDistribution};
+    use crate::{stats::{Distribution, ErrorFunction, NormalDistribution}, poly::Polynomial};
 
     #[test]
     fn it_works() {
         dbg!(ErrorFunction::default().error(5.));
 
         dbg!(NormalDistribution::standard().cdf(&0.2, ErrorFunction::default()));
+
+        dbg!([0., 4.].intergral().collect::<Vec<_>>());
     }
 }
