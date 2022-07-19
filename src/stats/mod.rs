@@ -2,7 +2,7 @@ use crate::{
     epsilon,
     fraction::{upper_gamma_fraction, Ratio, Tiny},
     series::kahan_sum,
-    Digits, Limit,
+    Digits,
 };
 use num::{
     traits::{real::Real, FloatConst},
@@ -22,10 +22,18 @@ pub trait Distribution {
     fn cdf(&self, x: &Self::Value, error: ErrorFunction) -> Self::Value;
 }
 
-#[derive(Default)]
 pub struct ErrorFunction {
-    pub sum_limit: Limit,
-    pub fraction_limit: Limit,
+    pub sum_max_iters: usize,
+    pub fraction_max_iters: usize,
+}
+
+impl Default for ErrorFunction {
+    fn default() -> Self {
+        Self {
+            sum_max_iters: 1_000_000,
+            fraction_max_iters: 1_000_000,
+        }
+    }
 }
 
 impl ErrorFunction {
@@ -64,7 +72,7 @@ impl ErrorFunction {
                 Some(result)
             });
 
-            T::FRAC_2_SQRT_PI() * kahan_sum(f.take(self.sum_limit.into()))
+            T::FRAC_2_SQRT_PI() * kahan_sum(f.take(self.sum_max_iters.into()))
         } else if x > T::one() / epsilon() {
             invert = !invert;
             (-x).exp() / (T::PI().sqrt() * value)
@@ -72,7 +80,12 @@ impl ErrorFunction {
             invert = !invert;
 
             ((value * (-x).exp()) / T::PI().sqrt())
-                * upper_gamma_fraction(Ratio::new(1, 2).into(), x, epsilon(), self.fraction_limit)
+                * upper_gamma_fraction(
+                    Ratio::new(1, 2).into(),
+                    x,
+                    epsilon(),
+                    self.fraction_max_iters,
+                )
         };
 
         if invert {

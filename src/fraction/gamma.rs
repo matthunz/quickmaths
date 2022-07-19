@@ -1,7 +1,6 @@
-use crate::Limit;
-use num::{traits::real::Real, FromPrimitive, One,};
+use super::{Fraction, Ratio, Tiny};
+use num::{traits::real::Real, FromPrimitive, One};
 use std::ops::{Add, Mul, Sub};
-use super::{Ratio, Tiny, Fraction};
 
 pub struct UpperIncompleteGammaFraction<T> {
     z: T,
@@ -39,7 +38,7 @@ where
     }
 }
 
-pub fn upper_gamma_fraction<T>(a: T, z: T, eps: T, limit: Limit) -> T
+pub fn upper_gamma_fraction<T>(a: T, z: T, eps: T, max_iters: usize) -> T
 where
     for<'t> &'t T: Add<Output = T> + Sub<Output = T> + Mul<Output = T>,
     T: Real + Tiny + FromPrimitive + One,
@@ -47,7 +46,7 @@ where
     // Multiply result by z^a * e^-z to get the full
     // upper incomplete integral.  Divide by tgamma(z)
     // to normalise.
-    let frac = UpperIncompleteGammaFraction::new(a, z).take(limit.into());
+    let frac = UpperIncompleteGammaFraction::new(a, z).take(max_iters);
 
     T::one() / (z - a + T::one() + frac.continued_fraction_a(eps))
 }
