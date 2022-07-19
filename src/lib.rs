@@ -11,6 +11,7 @@ pub use factor::Factor;
 pub mod fraction;
 
 pub mod integral;
+pub use integral::Integral;
 
 pub mod series;
 pub mod stats;

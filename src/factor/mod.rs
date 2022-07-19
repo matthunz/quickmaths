@@ -56,7 +56,7 @@ pub trait Factor: Clone {
 
     /// ```
     /// use quickmaths::Factor;
-    /// 
+    ///
     /// assert!(3.is_prime());
     /// assert!(!4.is_prime());
     /// ```

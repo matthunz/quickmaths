@@ -50,7 +50,6 @@ where
 /// let right = RiemannSum::right(1., 3., 1_000, |x| x);
 /// assert_relative_eq!(right.sum::<f32>(), 4.0020003);
 /// ```
-// TODO midpoint, left, right
 pub struct RiemannSum<F, T, S> {
     f: F,
     a: T,
