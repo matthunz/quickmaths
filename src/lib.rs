@@ -6,6 +6,7 @@ mod digits;
 pub use digits::Digits;
 
 pub mod factor;
+pub use factor::Factor;
 
 pub mod fraction;
 
