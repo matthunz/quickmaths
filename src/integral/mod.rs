@@ -1,3 +1,5 @@
+//! Integral approximations
+
 pub mod riemann;
 use num::{traits::real::Real, FromPrimitive};
 use rand::{distributions::Standard, prelude::Distribution};

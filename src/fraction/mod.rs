@@ -1,3 +1,5 @@
+//! Continued fractions
+
 use num::{traits::real::Real, One, ToPrimitive, Zero};
 
 mod gamma;

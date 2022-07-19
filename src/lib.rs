@@ -1,3 +1,5 @@
+//! A collection of algorithims for generic mathematics in Rust.
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod digits;
@@ -26,7 +28,7 @@ pub fn epsilon<T: One + FromPrimitive + Real>() -> T {
 
 /// ```
 /// use quickmaths::gcd;
-/// 
+///
 /// assert_eq!(gcd([1, 2]), 1);
 /// assert_eq!(gcd([3, 6]), 3);
 /// ```

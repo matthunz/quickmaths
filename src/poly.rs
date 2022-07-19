@@ -1,3 +1,5 @@
+//! Polynomials
+
 use core::ops::Div;
 use num::{FromPrimitive, Integer, Zero};
 

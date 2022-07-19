@@ -1,3 +1,5 @@
+//! Series
+
 use crate::{ldexp, Digits};
 use num::{traits::real::Real, FromPrimitive, Zero};
 

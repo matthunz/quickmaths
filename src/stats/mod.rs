@@ -1,3 +1,5 @@
+//! Statistics
+
 mod error;
 pub use error::ErrorFunction;
 
