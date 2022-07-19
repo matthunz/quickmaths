@@ -1,5 +1,4 @@
 mod digits;
-use std::marker::PhantomData;
 
 pub use digits::Digits;
 use num::{traits::real::Real, FromPrimitive, Integer, One, Zero};
