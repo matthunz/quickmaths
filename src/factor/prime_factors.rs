@@ -6,15 +6,6 @@ enum State<T> {
     Complete,
 }
 
-/// ```
-/// use quickmaths::factor::PrimeFactors;
-///
-/// assert!(PrimeFactors::new(0u32).eq([]));
-/// assert!(PrimeFactors::new(11u32).eq([11]));
-/// assert!(PrimeFactors::new(25u32).eq([5, 5]));
-/// assert!(PrimeFactors::new(33u32).eq([3, 11]));
-/// assert!(PrimeFactors::new(2560u32).eq([2, 2, 2, 2, 2, 2, 2, 2, 2, 5]));
-/// ```
 pub struct PrimeFactors<T> {
     n: T,
     state: State<T>,

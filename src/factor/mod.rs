@@ -5,6 +5,23 @@ pub use prime_factors::PrimeFactors;
 
 use num::{integer::Roots, range, FromPrimitive, Integer, Num, One, ToPrimitive, Unsigned};
 
+/// ```
+/// use quickmaths::factor::gcd;
+///
+/// assert_eq!(gcd([1, 2]), 1);
+/// assert_eq!(gcd([3, 6]), 3);
+/// ```
+pub fn gcd<I>(integers: I) -> I::Item
+where
+    I: IntoIterator,
+    I::Item: Integer,
+{
+    let mut iter = integers.into_iter();
+    iter.next()
+        .map(|i| iter.fold(i, |acc, i| acc.gcd(&i)))
+        .unwrap_or_else(|| I::Item::one())
+}
+
 pub trait Factor: Clone {
     /// ```
     /// use quickmaths::Factor;
@@ -21,6 +38,15 @@ pub trait Factor: Clone {
         Factors::new(self)
     }
 
+    /// ```
+    /// use quickmaths::Factor;
+    ///
+    /// assert!(0u32.prime_factors().eq([]));
+    /// assert!(11u32.prime_factors().eq([11]));
+    /// assert!(25u32.prime_factors().eq([5, 5]));
+    /// assert!(33u32.prime_factors().eq([3, 11]));
+    /// assert!(2560u32.prime_factors().eq([2, 2, 2, 2, 2, 2, 2, 2, 2, 5]));
+    /// ```
     fn prime_factors(self) -> PrimeFactors<Self>
     where
         Self: Unsigned + FromPrimitive + PartialOrd,
@@ -28,6 +54,12 @@ pub trait Factor: Clone {
         PrimeFactors::new(self)
     }
 
+    /// ```
+    /// use quickmaths::Factor;
+    /// 
+    /// assert!(3.is_prime());
+    /// assert!(!4.is_prime());
+    /// ```
     fn is_prime(self) -> bool
     where
         Self: Integer + Roots + FromPrimitive + ToPrimitive,
