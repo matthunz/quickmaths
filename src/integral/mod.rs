@@ -3,7 +3,6 @@ use num::{traits::real::Real, FromPrimitive};
 use rand::{distributions::Standard, prelude::Distribution};
 pub use riemann::RiemannSum;
 
-
 /// ```
 /// use quickmaths::integral::monte_carlo_integration;
 /// use approx::assert_relative_eq;
@@ -73,6 +72,6 @@ where
             result + f(x) * T::from_u8(4).unwrap()
         };
     }
-    
+
     result * (step / T::from_u8(3).unwrap())
 }
