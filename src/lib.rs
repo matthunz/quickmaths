@@ -3,6 +3,8 @@ mod digits;
 pub use digits::Digits;
 use num::{traits::real::Real, FromPrimitive, Integer, One, Zero};
 
+pub mod factor;
+
 pub mod fraction;
 
 pub mod integral;

@@ -40,13 +40,13 @@ where
 /// ```
 /// use quickmaths::integral::RiemannSum;
 /// use approx::assert_relative_eq;
-/// 
+///
 /// let mid = RiemannSum::midpoint(1., 3., 1_000, |x| x);
 /// assert_relative_eq!(mid.sum::<f32>(), 4.);
 ///
 /// let left = RiemannSum::left(1., 3., 1_000, |x| x);
 /// assert_relative_eq!(left.sum::<f32>(), 3.9980006);
-/// 
+///
 /// let right = RiemannSum::right(1., 3., 1_000, |x| x);
 /// assert_relative_eq!(right.sum::<f32>(), 4.0020003);
 /// ```
