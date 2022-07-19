@@ -1,9 +1,10 @@
 [package]
 name = "quickmaths"
 description = "A collection of algorithims for generic mathematics"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
+repository = "https://github.com/matthunz/quickmaths"
 
 [features]
 default = ["std"]
