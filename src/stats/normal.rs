@@ -3,11 +3,11 @@ use crate::{
     fraction::{Ratio, Tiny},
     Digits,
 };
+use core::ops::{Add, Mul, Sub};
 use num::{
     traits::{real::Real, FloatConst},
     FromPrimitive, One, Zero,
 };
-use std::ops::{Add, Mul, Sub};
 
 pub struct NormalDistribution<T> {
     mean: T,

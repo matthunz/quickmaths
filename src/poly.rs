@@ -1,5 +1,5 @@
+use core::ops::Div;
 use num::{FromPrimitive, Integer, Zero};
-use std::ops::Div;
 
 pub trait Polynomial: IntoIterator + Sized {
     /// ```

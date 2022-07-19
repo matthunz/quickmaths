@@ -1,6 +1,6 @@
 use super::{Fraction, Ratio, Tiny};
+use core::ops::{Add, Mul, Sub};
 use num::{traits::real::Real, FromPrimitive, One};
-use std::ops::{Add, Mul, Sub};
 
 pub struct UpperIncompleteGammaFraction<T> {
     z: T,

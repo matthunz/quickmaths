@@ -46,7 +46,7 @@ where
 ///
 /// ```
 /// use quickmaths::integral::simpson_integration;
-/// use std::f64::consts::PI;
+/// use core::f64::consts::PI;
 /// use approx::assert_relative_eq;
 ///
 /// // Calculate area under f(x) = cos(x) + 5 for -pi <= x <= pi

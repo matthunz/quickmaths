@@ -1,6 +1,11 @@
 use crate::{ldexp, Digits};
 use num::{traits::real::Real, FromPrimitive, Zero};
 
+/// ```
+/// use quickmaths::series::kahan_sum;
+///
+/// assert_eq!(kahan_sum([0.1; 10]), 1.);
+/// ```
 pub fn kahan_sum<T>(iter: T) -> T::Item
 where
     T: IntoIterator,
@@ -29,14 +34,4 @@ where
     }
 
     result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::kahan_sum;
-
-    #[test]
-    fn it_works() {
-        dbg!(kahan_sum([0.1; 10]));
-    }
 }
