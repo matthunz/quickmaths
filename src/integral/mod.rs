@@ -1,13 +1,39 @@
 pub mod riemann;
 use num::{traits::real::Real, FromPrimitive};
+use rand::{distributions::Standard, prelude::Distribution};
 pub use riemann::RiemannSum;
+
+
+/// ```
+/// use quickmaths::integral::monte_carlo_integration;
+/// use approx::assert_relative_eq;
+///
+/// // Integrate a polynomial
+/// let f = |x: f64| 3. * x.powi(2);
+/// let result = monte_carlo_integration(0., 1., 100_000, f);
+///
+/// assert_relative_eq!(result, 1., epsilon = 1e-2);
+/// ```
+pub fn monte_carlo_integration<F, T>(a: T, b: T, n: usize, mut f: F) -> T
+where
+    Standard: Distribution<T>,
+    F: FnMut(T) -> T,
+    T: Real + FromPrimitive,
+{
+    let dx = (b - a) / T::from_usize(n).unwrap();
+    let sum = (1..n).fold(T::zero(), |sum, _| {
+        let x = a + (b - a) * rand::random();
+        sum + f(x)
+    });
+
+    dx * sum
+}
 
 /// Calculate an approximation of the definite integral for function `f` from `start` to `end` with `n` steps
 /// using [Simpson's rule](https://en.wikipedia.org/wiki/Simpson%27s_rule).
 ///
 /// ```
 /// use quickmaths::integral::simpson_integration;
-/// use std::f64::consts::PI;
 /// use approx::assert_relative_eq;
 ///
 /// // Calculate the length of the curve f(x) = x^2 for -5 <= x <= 5
@@ -38,6 +64,7 @@ where
 {
     let mut result = f(start) + f(end);
     let step = (end - start) / T::from_usize(steps).unwrap();
+
     for i in 1..steps {
         let x = start + step * T::from_usize(i).unwrap();
         result = if i % 2 == 0 {
@@ -46,5 +73,6 @@ where
             result + f(x) * T::from_u8(4).unwrap()
         };
     }
+    
     result * (step / T::from_u8(3).unwrap())
 }
