@@ -27,7 +27,7 @@ pub trait Polynomial: IntoIterator + Sized {
     where
         Self::Item: Integer,
     {
-        crate::gcd(self)
+        crate::factor::gcd(self)
     }
 
     /// ```
